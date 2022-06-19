@@ -3,8 +3,8 @@ package bing
 import (
 	"context"
 	"fmt"
-	"math/rand"
 	"net/http"
+	"sort"
 	"sync"
 	"time"
 
@@ -76,6 +76,15 @@ func GetImageURL(num int, shuffle bool) ([]string, error) {
 	}
 	wg.Wait()
 
+	if !shuffle {
+		sort.Slice(imgs, func(i, j int) bool {
+			if imgs[i].Startdate > imgs[j].Startdate {
+				return true
+			}
+			return false
+		})
+	}
+
 	baseURL := "https://www.bing.com"
 	imgurls := []string{}
 	for _, img := range imgs {
@@ -83,11 +92,5 @@ func GetImageURL(num int, shuffle bool) ([]string, error) {
 		imgurls = append(imgurls, fullURL)
 	}
 
-	if shuffle {
-		rand.Seed(time.Now().UnixNano())
-		rand.Shuffle(len(imgurls), func(i, j int) {
-			imgurls[i], imgurls[j] = imgurls[j], imgurls[i]
-		})
-	}
 	return imgurls, nil
 }

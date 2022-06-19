@@ -7,7 +7,7 @@ import (
 )
 
 func TestGetImageURL(t *testing.T) {
-	urls, err := GetImageURL(16, true)
+	urls, err := GetImageURL(16, false)
 	require.Nil(t, err)
 	require.Len(t, urls, 16)
 	t.Log(urls)
