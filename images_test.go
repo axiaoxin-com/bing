@@ -11,7 +11,7 @@ import (
 func TestGetImageURL(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.TODO(), 1*time.Second)
 	defer cancel()
-	urls, err := GetImageURL(ctx, 3, true)
+	urls, err := GetImageURL(ctx, 3, true, ImageResolution240x320)
 	require.Nil(t, err)
 	require.Len(t, urls, 3)
 	t.Log(urls)
