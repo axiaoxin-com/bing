@@ -44,9 +44,9 @@ type HPImageArchiveData struct {
 }
 
 // GetImageURL 返回bing壁纸图片地址
-func GetImageURL(num int, shuffle bool) ([]string, error) {
+func GetImageURL(ctx context.Context, num int, shuffle bool) ([]string, error) {
 	hcli := &http.Client{
-		Timeout: time.Second * 60 * 5,
+		Timeout: time.Second * 60 * 3,
 	}
 	n := 8
 	pagecount := num / n
@@ -65,7 +65,7 @@ func GetImageURL(num int, shuffle bool) ([]string, error) {
 				"user-agent": uarand.GetRandom(),
 			}
 			data := HPImageArchiveData{}
-			if err := goutils.HTTPGET(context.Background(), hcli, apiurl, header, &data); err != nil {
+			if err := goutils.HTTPGET(ctx, hcli, apiurl, header, &data); err != nil {
 				fmt.Println(err)
 				return
 			}
