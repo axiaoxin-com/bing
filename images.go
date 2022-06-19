@@ -3,6 +3,7 @@ package bing
 import (
 	"context"
 	"fmt"
+	"math"
 	"net/http"
 	"sort"
 	"sync"
@@ -75,7 +76,7 @@ const (
 func GetImageURL(ctx context.Context, num int, shuffle bool, resolution ImageResolution) ([]string, error) {
 	hcli := &http.Client{}
 	n := 8
-	pagecount := num / n
+	pagecount := int(math.Floor(float64(num)/float64(n) + 0.5))
 	if pagecount < 1 {
 		pagecount = 1
 	}
