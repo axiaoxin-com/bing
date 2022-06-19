@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"sort"
 	"sync"
-	"time"
 
 	"github.com/axiaoxin-com/goutils"
 	"github.com/corpix/uarand"
@@ -45,9 +44,7 @@ type HPImageArchiveData struct {
 
 // GetImageURL 返回bing壁纸图片地址
 func GetImageURL(ctx context.Context, num int, shuffle bool) ([]string, error) {
-	hcli := &http.Client{
-		Timeout: time.Second * 60 * 3,
-	}
+	hcli := &http.Client{}
 	n := 8
 	pagecount := num / n
 	if pagecount < 1 {
@@ -90,6 +87,10 @@ func GetImageURL(ctx context.Context, num int, shuffle bool) ([]string, error) {
 	for _, img := range imgs {
 		fullURL := baseURL + img.URL
 		imgurls = append(imgurls, fullURL)
+	}
+
+	if len(imgurls) > num {
+		return imgurls[:num], nil
 	}
 
 	return imgurls, nil
