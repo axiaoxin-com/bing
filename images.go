@@ -30,11 +30,16 @@ type Image struct {
 
 // FullURL 返回完整url
 func (i *Image) FullURL(resolution ...ImageResolution) string {
+	return GetImageFullURL(i.Urlbase, resolution...)
+}
+
+// GetImageFullURL 返回完整url
+func GetImageFullURL(urlbase string, resolution ...ImageResolution) string {
 	rslt := ImageResolution1920x1080
 	if len(resolution) > 0 {
 		rslt = resolution[0]
 	}
-	return fmt.Sprintf("https://www.bing.com%s_%v.jpg", i.Urlbase, rslt)
+	return fmt.Sprintf("https://www.bing.com%s_%v.jpg", urlbase, rslt)
 }
 
 // HPImageArchiveData HPImageArchive.aspx 接口返回结构
