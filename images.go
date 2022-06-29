@@ -28,6 +28,15 @@ type Image struct {
 	Hs            []interface{} `json:"hs"`
 }
 
+// FullURL 返回完整url
+func (i *Image) FullURL(resolution ...ImageResolution) string {
+	rslt := ImageResolution1920x1080
+	if len(resolution) > 0 {
+		rslt = resolution[0]
+	}
+	return fmt.Sprintf("https://www.bing.com%s_%v.jpg", i.Urlbase, rslt)
+}
+
 // HPImageArchiveData HPImageArchive.aspx 接口返回结构
 type HPImageArchiveData struct {
 	Images   []Image `json:"images"`
@@ -69,8 +78,8 @@ const (
 	ImageResolutionUHD       ImageResolution = "UHD"
 )
 
-// GetImageURL 返回最近8张bing壁纸图片地址
-func GetImageURL(ctx context.Context, resolution ImageResolution) ([]string, error) {
+// GetImages 返回HPImageArchive的Images
+func GetImages(ctx context.Context) ([]Image, error) {
 	hcli := &http.Client{}
 	apiurl := "https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=8"
 	header := map[string]string{
@@ -81,11 +90,5 @@ func GetImageURL(ctx context.Context, resolution ImageResolution) ([]string, err
 		return nil, err
 	}
 
-	imgurls := []string{}
-	for _, img := range data.Images {
-		fullURL := fmt.Sprintf("https://www.bing.com%s_%v.jpg", img.Urlbase, resolution)
-		imgurls = append(imgurls, fullURL)
-	}
-
-	return imgurls, nil
+	return data.Images, nil
 }
