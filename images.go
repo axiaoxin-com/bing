@@ -3,10 +3,7 @@ package bing
 import (
 	"context"
 	"fmt"
-	"math"
 	"net/http"
-	"sort"
-	"sync"
 
 	"github.com/axiaoxin-com/goutils"
 	"github.com/corpix/uarand"
@@ -72,54 +69,22 @@ const (
 	ImageResolutionUHD       ImageResolution = "UHD"
 )
 
-// GetImageURL 返回bing壁纸图片地址
-func GetImageURL(ctx context.Context, num int, shuffle bool, resolution ImageResolution) ([]string, error) {
+// GetImageURL 返回最近8张bing壁纸图片地址
+func GetImageURL(ctx context.Context, resolution ImageResolution) ([]string, error) {
 	hcli := &http.Client{}
-	n := 8
-	pagecount := int(math.Floor(float64(num)/float64(n) + 0.5))
-	if pagecount < 1 {
-		pagecount = 1
+	apiurl := "https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=8"
+	header := map[string]string{
+		"user-agent": uarand.GetRandom(),
 	}
-	imgs := []Image{}
-	wg := sync.WaitGroup{}
-	mux := sync.Mutex{}
-	for idx := 0; idx < pagecount; idx++ {
-		wg.Add(1)
-		go func(idx int) {
-			defer wg.Done()
-			apiurl := fmt.Sprintf("https://www.bing.com/HPImageArchive.aspx?format=js&idx=%d&n=%d", idx, n)
-			header := map[string]string{
-				"user-agent": uarand.GetRandom(),
-			}
-			data := HPImageArchiveData{}
-			if err := goutils.HTTPGET(ctx, hcli, apiurl, header, &data); err != nil {
-				fmt.Println(err)
-				return
-			}
-			mux.Lock()
-			imgs = append(imgs, data.Images...)
-			mux.Unlock()
-		}(idx)
-	}
-	wg.Wait()
-
-	if !shuffle {
-		sort.Slice(imgs, func(i, j int) bool {
-			if imgs[i].Startdate > imgs[j].Startdate {
-				return true
-			}
-			return false
-		})
+	data := HPImageArchiveData{}
+	if err := goutils.HTTPGET(ctx, hcli, apiurl, header, &data); err != nil {
+		return nil, err
 	}
 
 	imgurls := []string{}
-	for _, img := range imgs {
-		fullURL := fmt.Sprintf("https://www.bing.com/%s_%v.jpg", img.Urlbase, resolution)
+	for _, img := range data.Images {
+		fullURL := fmt.Sprintf("https://www.bing.com%s_%v.jpg", img.Urlbase, resolution)
 		imgurls = append(imgurls, fullURL)
-	}
-
-	if len(imgurls) > num {
-		return imgurls[:num], nil
 	}
 
 	return imgurls, nil
