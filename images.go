@@ -37,7 +37,10 @@ func (i *Image) FullURL(resolution ...ImageResolution) string {
 func GetImageFullURL(urlbase string, resolution ...ImageResolution) string {
 	rslt := ImageResolution1920x1080
 	if len(resolution) > 0 {
-		rslt = resolution[0]
+		r0 := resolution[0]
+		if SupportedResolutions[r0] {
+			rslt = r0
+		}
 	}
 	return fmt.Sprintf("https://www.bing.com%s_%v.jpg", urlbase, rslt)
 }
@@ -82,6 +85,33 @@ const (
 	ImageResolution1920x1200 ImageResolution = "1920x1200"
 	ImageResolutionUHD       ImageResolution = "UHD"
 )
+
+// SupportedResolutions 支持的分辨率
+var SupportedResolutions = map[ImageResolution]bool{
+	ImageResolution240x320:   true,
+	ImageResolution320x240:   true,
+	ImageResolution240x400:   true,
+	ImageResolution400x240:   true,
+	ImageResolution480x640:   true,
+	ImageResolution640x480:   true,
+	ImageResolution480x800:   true,
+	ImageResolution800x480:   true,
+	ImageResolution600x800:   true,
+	ImageResolution800x600:   true,
+	ImageResolution720x1280:  true,
+	ImageResolution1280x720:  true,
+	ImageResolution768x1024:  true,
+	ImageResolution1024x768:  true,
+	ImageResolution768x1280:  true,
+	ImageResolution1280x768:  true,
+	ImageResolution768x1366:  true,
+	ImageResolution1366x768:  true,
+	ImageResolution1080x1920: true,
+	ImageResolution1920x1080: true,
+	ImageResolution1200x1920: true,
+	ImageResolution1920x1200: true,
+	ImageResolutionUHD:       true,
+}
 
 // GetImages 返回HPImageArchive的Images
 func GetImages(ctx context.Context) ([]Image, error) {
